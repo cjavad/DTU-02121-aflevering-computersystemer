@@ -8,7 +8,6 @@ D = A
 M = D
 
 (CHECK_01)
-
 @0
 D = M
 @1
@@ -16,8 +15,6 @@ M = D
 D = D - 1
 @PROGRAM_END
 D;JLE
-
-
 
 (LOOPSTART)
     @0
