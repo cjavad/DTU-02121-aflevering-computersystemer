@@ -61,11 +61,24 @@ def pop_3(a:int) -> int:
 def pop_2(a:int) -> int:
     prev1 = 0
     prev2 = 1
-    for i in range(2,a+1):
+    for _ in range(2,a+1):
         new = (11*prev2) // 5 - prev1
         prev1 = prev2
         prev2 = new
     return prev2
 
-print(pop_2(0))
-print(pop_3(0))
+print(pop_2(6))
+print(pop_3(6))
+
+
+def pop_4(a:int):
+    prev1 = 0;
+    prev2 = 1;
+    i = 2
+    check = a - i
+    check = check +1
+    while check != 0:
+        prod = prev2 + prev2
+        div = prod
+        div_call()
+        res = prod + div_res;

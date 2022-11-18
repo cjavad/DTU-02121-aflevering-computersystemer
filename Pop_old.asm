@@ -27,32 +27,29 @@ D;JLE
     D = D + 1
     @PROGRAM_END
     D;JEQ
-    
     @PREV2
     D = M
-    D = D + M
-    @ADDRES
+    @MULT
     M = D
-    @PREV2
+    @MULT_PROTO
+    0;JMP
+    (MULT_RETURN)
+    @MULT_RES
     D = M
     @DIV
     M = D
     @DIV_PROTO
     0;JMP
     (DIV_RETURN)
-    @DIV_RES
-    D = M
-    @ADDRES
-    D = D + M
     @PREV1
-    D = D - M
-    @NEWVAL
-    M = D
+    D = M
+    @DIV_RES
+    M = M - D
     @PREV2
     D = M
     @PREV1
     M = D
-    @NEWVAL
+    @DIV_RES
     D = M
     @PREV2
     M = D
@@ -94,6 +91,32 @@ D;JLE
 
     (DIV_END)
     @DIV_RETURN
+    0;JMP
+@MULT           //Mult protocol:
+@MULT_RES       //Since we ALWAYS will multiply with 11. We can just
+(MULT_PROTO)    //Hardcode the protocol
+    @MULT
+    D = M
+    @MULT_RES
+    M = D
+    M = D + M
+    D = M
+    @TMP
+    M = D
+    @MULT_RES
+    D = M
+    M = D + M
+    D = M
+    M = D + M
+    @TMP
+    D = M
+    @MULT_RES
+    M = D + M
+    @MULT
+    D = M
+    @MULT_RES
+    M = D + M
+    @MULT_RETURN
     0;JMP
 (PROGRAM_END)
 @PROGRAM_END
