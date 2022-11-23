@@ -2,7 +2,7 @@ DTU 02121 Afleveringsopgave: Computersystemer.
 
 Gruppemedlemmer and deres arbejdsfordeling:
   
-Christian Frølund Søtorp Mødte ikke op
-Javad Asgari Shafique   POP.asm
-Thor Frøding Skipper    POP.asm     CPU.hdl     Computer.hdl
-Rasmus Gross Jakobsen   CPU.hdl     Memory.hdl  Computer.hdl
+Christian Frølund Søtorp    CPU.hdl     Memory.hdl  Computer.hdl
+Javad Asgari Shafique       POP.asm
+Thor Frøding Skipper        POP.asm     CPU.hdl     Computer.hdl
+Rasmus Gross Jakobsen       Mødte ikke op
