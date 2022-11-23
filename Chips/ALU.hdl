@@ -1,6 +1,8 @@
 /*
 ALU Chip implementation for the HACK CPU.
 DTU 02121
+
+Udarbejdet individuelt af Javad Asgari Shafique i bordgruppe med Hjalte Nannestad
 */
 
 CHIP ALU {
