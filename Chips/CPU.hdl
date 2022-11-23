@@ -1,0 +1,97 @@
+/**
+ * The Hack CPU (Central Processing unit), consisting of an ALU,
+ * two registers named A and D, and a program counter named PC.
+ * The CPU is designed to fetch and execute instructions written in
+ * the Hack machine language. In particular, functions as follows:
+ * Executes the inputted instruction according to the Hack machine
+ * language specification. The D and A in the language specification
+ * refer to CPU-resident registers, while M refers to the external
+ * memory location addressed by A, i.e. to Memory[A]. The inM input
+ * holds the value of this location. If the current instruction needs
+ * to write a value to M, the value is placed in outM, the address
+ * of the target location is placed in the addressM output, and the
+ * writeM control bit is asserted. (When writeM==0, any value may
+ * appear in outM). The outM and writeM outputs are combinational:
+ * they are affected instantaneously by the execution of the current
+ * instruction. The addressM and pc outputs are clocked: although they
+ * are affected by the execution of the current instruction, they commit
+ * to their new values only in the next time step. If reset==1 then the
+ * CPU jumps to address 0 (i.e. pc is set to 0 in next time step) rather
+ * than to the address resulting from executing the current instruction.
+ */
+CHIP CPU {
+	IN
+		inM[16],         // M value input  (M = contents of RAM[A])
+		instruction[16], // Instruction for execution
+		reset;           // Signals whether to re-start the current
+		                 // program (reset==1) or continue executing
+		                 // the current program (reset==0).
+
+	OUT
+		outM[16],        // M value output
+		writeM,          // Write to M?
+		addressM[15],    // Address in data memory (of M)
+		pc[15];          // address of next instruction
+
+	PARTS:
+	//Ved ins[15] == false, skal der laves en A instruktion.
+	//Som er at A registret bliver sat til værdien af ins[0..14]
+	
+	
+	//Der bruges en række af ands for at tjekke om det skal laves en C instruktion
+	And(a=instruction[15],b=instruction[14],out=ctjek1);
+	And(a=ctjek1, b=instruction[13], out =Cins);
+	
+	
+	//A-register
+	//Reverse load input. Needs to be 0 to load. NOT 1
+	Not(in = instruction[15], out = AInsload);
+	//Vælg om inputte til A-register er fra instatuktion eller resultat fra ALU.
+	And(a=Cins,b=instruction[5],out=Asel);
+	Mux16(a = instruction, b = ALUout, sel=Asel, out = AInput);
+	Or(a = AInsload, b = Asel, out = Aload);
+	ARegister(in = AInput, out[0..14] = addressM, load =Aload, out = Aout);
+	
+		//Ved ins[12..15] == true. Skal der laves en C instruktion. Som udregner matematik og gemmer værdier i en addresse
+	
+	
+	
+	//D-register
+	//Det er kun hvis der laves en C instruktion og ins[4] == true at D register skal hente værdien af ALUOut
+	And(a=Cins, b=instruction[4], out=Dload);
+	DRegister(in=ALUout, out = Dout, load=Dload);
+	
+	
+
+	
+	
+	//a bitten i en C instruktion (ins[12]) bestemmer om der skal bruges A eller M som input i ALU'en.
+	Mux16(a = Aout, b=inM,sel = instruction[12], out=ALUin);
+
+	ALU(x = Dout,y = ALUin,zx=instruction[11],nx=instruction[10],zy=instruction[9], ny=instruction[8],f=instruction[7],no=instruction[6],out=ALUout, out=outM,ng=resLt0, zr=resEq0);
+	
+	
+	//Det er kun hvis ins[3] == true OG der bruges en c-instruktion at der skal skrives til memory.
+	And(a=Cins, b=instruction[3],out=writeM);
+	
+	//Tjekke om (mindre end 0 + jump lt 0) og (lig 0 + jmp lig 0) og (større end 0 + jump gt 0)	
+	//Tjek mindre end 0
+	And(a=resLt0,b=instruction[2],out=jmp1);
+	//Tjek lig 0
+	And(a = resEq0,b=instruction[1],out=jmp2);
+	//Tjek større 0
+	Or(a=resEq0,b=resLt0, out=gt0N);
+	Not(in=gt0N,out=gt0);
+	And(a=gt0,b=instruction[0],out=jmp3);
+	
+	Or(a=jmp1,b=jmp2,out=jmptmp);
+	Or(a=jmptmp,b=jmp3,out=jmpifC);
+	And(a=jmpifC, b=Cins, out = jmp);
+	
+
+
+	//Increment program counter if it needs to continue. Else reset
+	PC(in = Aout, inc=true, load=jmp, reset = reset, out[0..14]=pc);
+	
+	
+}
