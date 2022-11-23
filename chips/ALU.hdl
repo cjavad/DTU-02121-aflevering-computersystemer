@@ -1,0 +1,39 @@
+/*
+ALU Chip implementation for the HACK CPU.
+DTU 02121
+*/
+
+CHIP ALU {
+	IN
+		x[16], y[16], // 16-bit inputs
+		zx,           // zero the x input?
+		nx,           // negate the x input?
+		zy,           // zero the y input?
+		ny,           // negate the y input?
+		f,            // compute out = x + y (if 1) or x & y (if 0)
+		no;           // negate the out output?
+
+	OUT
+		out[16], // 16-bit output
+		zr,      // 1 if (out == 0), 0 otherwise
+		ng;      // 1 if (out < 0),  0 otherwise
+
+	PARTS:
+	// Put you code here:
+	Mux16(a=x, b=false, sel=zx, out=x1);
+	Mux16(a=y, b=false, sel=zy, out=y1);
+	Not16(in=x1, out=x2);
+	Not16(in=y1, out=y2);
+	Mux16(a=x1, b=x2, sel=nx, out=x3);
+	Mux16(a=y1, b=y2, sel=ny, out=y3);
+	And16(a=x3, b=y3, out=and1);
+	Add16(a=x3, b=y3, out=add1);
+	Mux16(a=and1, b=add1, sel=f, out=preout);
+	Not16(in=preout, out=notout);
+	Mux16(a=preout, b=notout, sel=no, out=out1, out[15]=ng, out[0..7]=low, out[8..15]=high);
+	Or8Way(in=low, out=o1);
+    Or8Way(in=high, out=o2);
+    Or(a=o1, b=o2, out=notztr);
+	Not(in=notztr, out=zr);
+	Or16(a=out1, b=false, out=out);
+}
